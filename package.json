@@ -39,6 +39,7 @@
     "@nestjs/passport": "^9.0.3",
     "@nestjs/platform-express": "7.6.18",
     "@nestjs/schedule": "^2.2.0",
+    "@nestjs/serve-static": "^4.0.2",
     "@nestjs/swagger": "^4.8.2",
     "@nestjs/typeorm": "^9.0.1",
     "@types/nodemailer": "^6.4.7",

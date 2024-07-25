@@ -24,16 +24,12 @@ export class ProductController {
   ) { }
 
   @Post('')
-  @UseInterceptors(FileInterceptor('file'))
   async createProduct(
-    @UploadedFile() file: Express.Multer.File,
     @Body() createProductDto: CreateProductDto
   ) {
     try {
-      const fileEntity = await this.fileService.uploadFileInternal(file);
-
       // Save the product with file reference
-      const product = await this.productService.createProduct({ ...createProductDto }, fileEntity);
+      const product = await this.productService.createProduct({ ...createProductDto });
       if (product)
         return CommonHelper.successResponsePayload(
           'Product created successfully',

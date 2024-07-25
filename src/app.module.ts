@@ -2,7 +2,6 @@ import {
   MiddlewareConsumer,
   Module,
   NestModule,
-  RequestMethod,
 } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -23,9 +22,15 @@ import { ProductController } from "./modules/product/product.controller";
 import { ProductModule } from "./modules/product/product.module";
 import { CategoryController } from "./modules/category/category.controller";
 import { CategoryModule } from "./modules/category/category.module";
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 @Module({
   imports: [
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'storage'),
+      serveRoot: '/storage/',
+    }),
     TypeOrmModule.forRoot(configService.getTypeOrmConfig()),
     RoleModule,
     AuthenticationModule,

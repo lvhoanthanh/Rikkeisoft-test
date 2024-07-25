@@ -16,9 +16,9 @@ export class ProductService {
     private readonly categoryRepository: Repository<CategoryEntity>,
     @InjectRepository(FileEntity)
     private readonly fileRepository: Repository<FileEntity>,
-  ) {}
+  ) { }
 
-  async createProduct(createProductDto: CreateProductDto, fileEntity?: FileEntity): Promise<ProductEntity> {
+  async createProduct(createProductDto: CreateProductDto): Promise<ProductEntity> {
     const { name, description, price, categoryId } = createProductDto;
 
     const category = await this.categoryRepository.findOne(categoryId);
@@ -31,19 +31,15 @@ export class ProductService {
     product.description = description;
     product.price = price;
     product.category = category;
-    product.image = fileEntity || null;
-
     return this.productRepository.save(product);
   }
 
-  async updateProduct(id: string, updateProductDto: UpdateProductDto): Promise<ProductEntity> {
+  async updateProduct(id: string, updateProductDto: UpdateProductDto, file?: any): Promise<ProductEntity> {
     const product = await this.productRepository.preload({
       id,
       ...updateProductDto,
     });
-    if (!product) {
-      throw new Error('Product not found');
-    }
+
     return this.productRepository.save(product);
   }
 
@@ -60,10 +56,17 @@ export class ProductService {
   }
 
   async fetchProducts(paginationOptions, searchQuery): Promise<any> {
-    const queryBuilder = this.productRepository.createQueryBuilder('product');
+    const queryBuilder = this.productRepository.createQueryBuilder('products')
+      .leftJoinAndSelect('products.category', 'category')
+      .leftJoinAndSelect('products.image', 'files');
 
-    if(searchQuery) 
-      queryBuilder.where('categories.name LIKE :keyword', { keyword: `%${searchQuery}%` });
+    if (searchQuery.keyword) {
+      queryBuilder.where('products.name LIKE :keyword', { keyword: `%${searchQuery.keyword}%` });
+    }
+    // Filter by multiple categories if provided
+    if (searchQuery.categoryIds && searchQuery.categoryIds.length > 0) {
+      queryBuilder.andWhere('category.id IN (:...categoryIds)', { categoryIds: searchQuery.categoryIds });
+    }
 
     // Use the pagination helper method
     return CommonHelper.pagination(paginationOptions, queryBuilder);

@@ -29,4 +29,7 @@ export class ProductEntity extends BaseEntity {
 
   @OneToOne(() => FileEntity, (image) => image.product)
   image: FileEntity;
+
+  @Column({ nullable: true })
+  categoryId?: string;
 }
