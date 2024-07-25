@@ -15,13 +15,12 @@ import { ProductService } from "./product.service";
 import { CreateProductDto, UpdateProductDto } from "./product.validation";
 import { CommonHelper } from "../../helpers/common";
 import { FileService } from '../file/file.service';
-import { FileEntity } from '../../models/file.entity';
 
 @Controller('/api/products')
 export class ProductController {
   constructor(
     private readonly productService: ProductService,
-    private readonly fileService: FileService, // Inject FileService
+    private readonly fileService: FileService,
   ) { }
 
   @Post('')
@@ -31,19 +30,19 @@ export class ProductController {
     @Body() createProductDto: CreateProductDto
   ) {
     try {
-      let fileEntity;
-      if (!file) {
-        fileEntity = await this.fileService.uploadFileInternal(file);
+      const fileEntity = await this.fileService.uploadFileInternal(file);
 
-        // Save the product with file reference
-        const product = await this.productService.createProduct({ ...createProductDto }, fileEntity);
+      // Save the product with file reference
+      const product = await this.productService.createProduct({ ...createProductDto }, fileEntity);
+      if (product)
+        return CommonHelper.successResponsePayload(
+          'Product created successfully',
+          product
+        );
 
-        return {
-          status: 'success',
-          message: 'Product and file created successfully',
-          data: product
-        };
-      }
+      return CommonHelper.failResponsePayload(
+        'Product create falied'
+      );
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
@@ -77,12 +76,16 @@ export class ProductController {
 
   @Get('/:id')
   async getProductById(@Param('id') id: string) {
-    console.log(id, 'aaaaaaaa')
     try {
       const product = await this.productService.getProductById(id);
-      return CommonHelper.successResponsePayload(
-        'Product updated successfully',
-        product
+      if (product)
+        return CommonHelper.successResponsePayload(
+          'Product updated successfully',
+          product
+        );
+        
+      return CommonHelper.failResponsePayload(
+        'Product Not Found'
       );
     } catch (error) {
       throw new Error(error);

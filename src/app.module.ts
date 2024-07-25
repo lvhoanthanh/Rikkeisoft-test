@@ -21,6 +21,8 @@ import { FileController } from './modules/file/file.controller';
 import { FileModule } from "./modules/file/file.module";
 import { ProductController } from "./modules/product/product.controller";
 import { ProductModule } from "./modules/product/product.module";
+import { CategoryController } from "./modules/category/category.controller";
+import { CategoryModule } from "./modules/category/category.module";
 
 @Module({
   imports: [
@@ -31,6 +33,7 @@ import { ProductModule } from "./modules/product/product.module";
     CronModule,
     FileModule,
     ProductModule,
+    CategoryModule
   ],
   controllers: [AppController],
   providers: [AppService],
@@ -45,7 +48,8 @@ export class AppModule implements NestModule {
         UserController,
         RoleController,
         FileController,
-        ProductController
+        ProductController,
+        CategoryController
       );
   }
 }

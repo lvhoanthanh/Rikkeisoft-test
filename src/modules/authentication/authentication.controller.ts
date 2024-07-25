@@ -10,7 +10,6 @@ import { UserService } from '../user/user.service';
 import { FileService } from '../file/file.service';
 import { Constants } from '../../helpers/constants';
 
-// import { Connection } from 'typeorm';
 import * as jwt from 'jsonwebtoken';
 import { CommonHelper } from '../../helpers/common';
 import { GeneralStatus } from '../../helpers/enums';
@@ -21,8 +20,7 @@ export class AuthenticationController {
     readonly userService: UserService,
     readonly tokens: TokensService,
     readonly fileService: FileService,
-    // private connection: Connection,
-  ) {}
+  ) { }
 
   @Post('/login')
   public async login(@Body() body: AuthLoginValidation) {
@@ -60,6 +58,31 @@ export class AuthenticationController {
         ...(refresh ? { refreshToken: refresh } : {}),
       },
     });
+  }
+
+  @Post('logout')
+  async logout(@Req() req) {
+    const authHeaders = req.headers.authorization;
+    if (!authHeaders) {
+      return CommonHelper.failResponsePayload(
+        'No token provided'
+      );
+    }
+
+    const currentUser = await this.getCurrentUserWithToken(req);
+    if (!currentUser)
+      return CommonHelper.failResponsePayload(
+        'User not found'
+      );
+
+    const token = authHeaders.split(' ')[1];
+
+    const decoded: any = await this.tokens.decodeRefreshToken(token);
+    await this.tokens.revokeRefreshToken(decoded.jti);
+    
+    return CommonHelper.successResponsePayload(
+      'Logout successful',
+    );
   }
 
   @Post('/refresh')

@@ -105,18 +105,26 @@ export class UserService extends TransactionFor<UserService> {
     return await CommonHelper.pagination(paginationOptions, userQuery);
   }
 
-  public async findById(id: string): Promise<UserEntity | null> {
-    const userQuery = this.userRepository.createQueryBuilder("users")
-      .leftJoinAndSelect('users.role', 'role')
-      .leftJoinAndSelect('users.userData', 'userData')
-      .andWhere("users.id = :id", { id })
-      .getOne()
-    return userQuery;
+  // public async findById(id: string): Promise<UserEntity | null> {
+  //   const userQuery = this.userRepository.createQueryBuilder("users")
+  //     .leftJoinAndSelect('users.role', 'role')
+  //     .leftJoinAndSelect('role.permissions', 'permissions')
+  //     .leftJoinAndSelect('users.userData', 'userData')
+  //     .andWhere("users.id = :id", { id })
+  //     .getOne()
+  //   return userQuery;
+  // }
+  public async findById(id: string): Promise<UserEntity> {
+    return this.userRepository.findOne({
+      where: { id },
+      relations: ['role', 'role.permissions'],
+    });
   }
 
   public async findByIdWithStatusActive(id: string): Promise<UserEntity | null> {
     const userQuery = this.userRepository.createQueryBuilder("users")
       .leftJoinAndSelect('users.role', 'role')
+      .leftJoinAndSelect('role.permissions', 'permissions')
       .leftJoinAndSelect('users.userData', 'userData')
       .andWhere("users.id = :id", { id })
       .andWhere("users.status = :status", { status: GeneralStatus.ACTIVE })
@@ -127,6 +135,7 @@ export class UserService extends TransactionFor<UserService> {
   public async findByEmail(email: string): Promise<UserEntity | null> {
     const userQuery = this.userRepository.createQueryBuilder("users")
       .leftJoinAndSelect('users.role', 'role')
+      .leftJoinAndSelect('role.permissions', 'permissions')
       .leftJoinAndSelect('users.userData', 'userData')
       .andWhere("users.email = :email", { email })
       .andWhere(`users.status != :status`, { status: GeneralStatus.TERMINATED })
@@ -137,6 +146,7 @@ export class UserService extends TransactionFor<UserService> {
   public async findByUsername(username: string): Promise<UserEntity | null> {
     const userQuery = this.userRepository.createQueryBuilder("users")
       .leftJoinAndSelect('users.role', 'role')
+      .leftJoinAndSelect('role.permissions', 'permissions')
       .leftJoinAndSelect('users.userData', 'userData')
       .andWhere("users.username = :username", { username })
       .andWhere(`users.status != :status`, { status: GeneralStatus.TERMINATED })
@@ -149,6 +159,7 @@ export class UserService extends TransactionFor<UserService> {
       .andWhere("users.email = :email", { email })
       .select(['users.id', 'users.email', 'users.password', 'users.username', 'users.status', 'users.createdAt', 'users.updatedAt'])
       .leftJoinAndSelect('users.role', 'role')
+      .leftJoinAndSelect('role.permissions', 'permissions')
       .leftJoinAndSelect('users.userData', 'userData')
       .getOne();
     return userQuery;
@@ -159,6 +170,7 @@ export class UserService extends TransactionFor<UserService> {
       .andWhere("users.username = :username", { username })
       .select(['users.id', 'users.email', 'users.password', 'users.username', 'users.status', 'users.createdAt', 'users.updatedAt'])
       .leftJoinAndSelect('users.role', 'role')
+      .leftJoinAndSelect('role.permissions', 'permissions')
       .leftJoinAndSelect('users.userData', 'userData')
       .getOne()
     return userQuery;

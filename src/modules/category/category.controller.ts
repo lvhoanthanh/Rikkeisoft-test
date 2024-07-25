@@ -5,16 +5,21 @@ import { CommonHelper } from "../../helpers/common";
 
 @Controller('/api/categories')
 export class CategoryController {
-  constructor(private readonly categoryService: CategoryService) {}
+  constructor(private readonly categoryService: CategoryService) { }
 
   @Post('')
   async createCategory(@Body() createCategoryDto: CreateCategoryDto) {
     try {
+      const isExitName = await this.categoryService.getCategoryByName(createCategoryDto.name)
+      if (isExitName)
+        return CommonHelper.failResponsePayload(
+          'Name is exist. Please check it!',
+        );
       const category = await this.categoryService.createCategory(createCategoryDto);
-      return {
-        message: 'Category created successfully',
-        category,
-      };
+      return CommonHelper.successResponsePayload(
+        'Category created successfully',
+        category
+      );
     } catch (error) {
       throw new Error(error);
     }
@@ -24,10 +29,10 @@ export class CategoryController {
   async updateCategory(@Param('id') id: string, @Body() updateCategoryDto: UpdateCategoryDto) {
     try {
       const category = await this.categoryService.updateCategory(id, updateCategoryDto);
-      return {
-        message: 'Category updated successfully',
-        category,
-      };
+      return CommonHelper.successResponsePayload(
+        'Updated category successfully',
+        category
+      );
     } catch (error) {
       throw new Error(error);
     }
@@ -37,9 +42,9 @@ export class CategoryController {
   async deleteCategory(@Param('id') id: string) {
     try {
       await this.categoryService.deleteCategory(id);
-      return {
-        message: 'Category deleted successfully',
-      };
+      return CommonHelper.successResponsePayload(
+        'Deleted category successfully',
+      );
     } catch (error) {
       throw new Error(error);
     }
@@ -49,10 +54,10 @@ export class CategoryController {
   async getCategoryById(@Param('id') id: string) {
     try {
       const category = await this.categoryService.getCategoryById(id);
-      return {
-        message: 'Category fetched successfully',
-        category,
-      };
+      return CommonHelper.successResponsePayload(
+        'Get category successfully',
+        category
+      );
     } catch (error) {
       throw new Error(error);
     }

@@ -1,8 +1,6 @@
 
 import { IsString, IsNotEmpty, IsOptional } from 'class-validator';
 import { PartialType } from '@nestjs/mapped-types';
-
-// DTO để tạo mới category
 export class CreateCategoryDto {
   @IsString()
   @IsNotEmpty()

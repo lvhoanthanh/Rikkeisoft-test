@@ -34,4 +34,15 @@ export class RefreshTokensRepository {
     const refreshToken = await this.refreshTokenRepository.findOne(id);
     return refreshToken;
   }
+  
+  async revokeToken(tokenId: number): Promise<void> {
+    const token = await this.refreshTokenRepository.findOne(tokenId);
+
+    if (!token) {
+      throw new Error('Token not found');
+    }
+
+    token.isRevoked = true;
+    await this.refreshTokenRepository.save(token); // Save the updated token
+  }
 }

@@ -62,10 +62,8 @@ export class ProductService {
   async fetchProducts(paginationOptions, searchQuery): Promise<any> {
     const queryBuilder = this.productRepository.createQueryBuilder('product');
 
-    // Apply search filters
-    Object.keys(searchQuery).forEach(key => {
-      queryBuilder.andWhere(`product.${key} LIKE :${key}`, { [`${key}`]: `%${searchQuery[key]}%` });
-    });
+    if(searchQuery) 
+      queryBuilder.where('categories.name LIKE :keyword', { keyword: `%${searchQuery}%` });
 
     // Use the pagination helper method
     return CommonHelper.pagination(paginationOptions, queryBuilder);

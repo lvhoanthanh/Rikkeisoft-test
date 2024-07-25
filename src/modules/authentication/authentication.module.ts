@@ -23,7 +23,7 @@ import { FileModule } from "../file/file.module";
     JwtModule.register({
       secret: Constants.SECRET,
       signOptions: {
-        expiresIn: '1d',
+        expiresIn: '5m',
       },
     }),
     UserModule,

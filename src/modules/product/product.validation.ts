@@ -10,14 +10,13 @@ export class CreateProductDto {
   @IsNotEmpty()
   readonly description: string;
 
-  @IsNumber()
+  // @IsNumber()
   @IsNotEmpty()
   readonly price: number;
 
-  @IsNumber()
+  @IsString()
   @IsNotEmpty()
-  readonly categoryId: number;
-
+  readonly categoryId: string;
 }
 
 export class UpdateProductDto extends PartialType(CreateProductDto) {}

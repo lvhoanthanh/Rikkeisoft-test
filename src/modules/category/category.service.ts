@@ -13,6 +13,7 @@ export class CategoryService {
   ) {}
 
   async createCategory(createCategoryDto: CreateCategoryDto): Promise<CategoryEntity> {
+
     const category = this.categoryRepository.create(createCategoryDto);
     return this.categoryRepository.save(category);
   }
@@ -40,14 +41,18 @@ export class CategoryService {
     return this.categoryRepository.findOne(id);
   }
 
-  async fetchCategories(paginationOptions, searchQuery): Promise<any> {
-    const queryBuilder = this.categoryRepository.createQueryBuilder('category');
-
-    // Apply search filters
-    Object.keys(searchQuery).forEach(key => {
-      queryBuilder.andWhere(`category.${key} LIKE :${key}`, { [`${key}`]: `%${searchQuery[key]}%` });
+  
+  async getCategoryByName(name: string): Promise<CategoryEntity> {
+    const existingCategory = await this.categoryRepository.findOne({
+      where: { name: name },
     });
+    return existingCategory
+  }
 
+  async fetchCategories(paginationOptions, searchQuery): Promise<any> {
+    const queryBuilder = this.categoryRepository.createQueryBuilder('categories')
+    if(searchQuery.keyword) 
+      queryBuilder.where('categories.name LIKE :keyword', { keyword: `%${searchQuery.keyword}%` });
     // Use the pagination helper method
     return CommonHelper.pagination(paginationOptions, queryBuilder);
   }

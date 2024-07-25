@@ -34,6 +34,18 @@ export class TokensService {
     this.jwt = jwt;
   }
 
+  public async destroyToken(
+    user: UserEntity,
+    expiresIn = 1
+  ): Promise<string> {
+    const opts: SignOptions = {
+      ...BASE_OPTIONS,
+      expiresIn,
+      subject: String(user.id),
+    };
+    return this.jwt.signAsync({}, opts);
+  }
+
   public async generateAccessToken(
     user: UserEntity,
     expiresIn = 60 * 60 * 24
@@ -94,7 +106,11 @@ export class TokensService {
     return { user, token };
   }
 
-  private async decodeRefreshToken(
+  public async revokeRefreshToken(tokenId: number): Promise<void> {
+    await this.tokens.revokeToken(tokenId);
+  }
+
+  async decodeRefreshToken(
     token: string,
   ): Promise<RefreshTokenPayload> {
     try {
