@@ -41,9 +41,7 @@ export class FileOption {
     const extension = path.extname(originalname);
 
     const listExtensionImage = ['.geojson'];
-    // const fileMaxSize = 1024 * 1024 * 10;
     if (!listExtensionImage.includes(extension.toLowerCase())) return CommonHelper.failResponsePayload(`${inputName}: Unsupported file type ${extension}`)
-    // if (size > fileMaxSize) return CommonHelper.buildResponseFailPayload(`${inputName}: File size can't be larger than ${fileMaxSize}`)
     return CommonHelper.successResponsePayload('OK', { type: 'geojsons' })
   }
 
